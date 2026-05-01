@@ -120,7 +120,7 @@ export default function Hero() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center pt-28 md:pt-16 lg:pt-0">
         {/* Badge */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
