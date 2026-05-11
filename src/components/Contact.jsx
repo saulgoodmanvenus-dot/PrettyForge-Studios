@@ -1,6 +1,50 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { collection, addDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 
 export default function Contact() {
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    projectType: 'Website Development',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null); // 'success' or 'error'
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+
+    try {
+      await addDoc(collection(db, 'contact_queries'), {
+        ...formData,
+        timestamp: new Date()
+      });
+      setSubmitStatus('success');
+      setFormData({
+        fullName: '',
+        email: '',
+        projectType: 'Website Development',
+        message: ''
+      });
+    } catch (error) {
+      console.error("Error adding document: ", error);
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   return (
     <section id="contact" className="section-padding bg-white relative overflow-hidden">
       {/* Background blobs */}
@@ -54,35 +98,80 @@ export default function Contact() {
             viewport={{ once: true }}
             className="bg-white p-6 sm:p-8 md:p-12 rounded-[2rem] border border-gray-100 shadow-2xl shadow-gray-200/50"
           >
-            <form className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-gray-700">Full Name</label>
-                  <input type="text" className="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-transparent focus:border-[#c8a84e] focus:bg-white outline-none transition-all" placeholder="John Doe" />
+                  <input 
+                    type="text" 
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-transparent focus:border-[#c8a84e] focus:bg-white outline-none transition-all" 
+                    placeholder="John Doe" 
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-gray-700">Email Address</label>
-                  <input type="email" className="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-transparent focus:border-[#c8a84e] focus:bg-white outline-none transition-all" placeholder="john@example.com" />
+                  <input 
+                    type="email" 
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-transparent focus:border-[#c8a84e] focus:bg-white outline-none transition-all" 
+                    placeholder="john@example.com" 
+                  />
                 </div>
               </div>
               
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-gray-700">Project Type</label>
-                <select className="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-transparent focus:border-[#c8a84e] focus:bg-white outline-none transition-all">
-                  <option>Website Development</option>
-                  <option>E-Commerce Solution</option>
-                  <option>3D Configurator</option>
-                  <option>Other Service</option>
+                <select 
+                  name="projectType"
+                  value={formData.projectType}
+                  onChange={handleChange}
+                  className="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-transparent focus:border-[#c8a84e] focus:bg-white outline-none transition-all"
+                >
+                  <option value="Website Development">Website Development</option>
+                  <option value="E-Commerce Solution">E-Commerce Solution</option>
+                  <option value="3D Configurator">3D Configurator</option>
+                  <option value="Other Service">Other Service</option>
                 </select>
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-gray-700">Your Message</label>
-                <textarea rows="4" className="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-transparent focus:border-[#c8a84e] focus:bg-white outline-none transition-all resize-none" placeholder="Tell us about your project..."></textarea>
+                <textarea 
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
+                  rows="4" 
+                  className="w-full px-6 py-4 rounded-2xl bg-gray-50 border border-transparent focus:border-[#c8a84e] focus:bg-white outline-none transition-all resize-none" 
+                  placeholder="Tell us about your project..."
+                ></textarea>
               </div>
 
-              <button className="w-full py-5 rounded-2xl bg-gray-900 text-white font-bold text-lg hover:bg-[#c8a84e] transition-all duration-300 shadow-xl shadow-gray-200 hover:shadow-[#c8a84e]/20">
-                Send Message
+              {submitStatus === 'success' && (
+                <div className="p-4 rounded-2xl bg-green-50 text-green-700 text-sm font-medium">
+                  Message sent successfully! We will get back to you soon.
+                </div>
+              )}
+
+              {submitStatus === 'error' && (
+                <div className="p-4 rounded-2xl bg-red-50 text-red-700 text-sm font-medium">
+                  Failed to send message. Please try again or contact us directly.
+                </div>
+              )}
+
+              <button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="w-full py-5 rounded-2xl bg-gray-900 text-white font-bold text-lg hover:bg-[#c8a84e] transition-all duration-300 shadow-xl shadow-gray-200 hover:shadow-[#c8a84e]/20 disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? 'Sending...' : 'Send Message'}
               </button>
             </form>
           </motion.div>
