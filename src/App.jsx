@@ -1,26 +1,52 @@
-import React from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
-import Services from './components/Services';
-import Pricing from './components/Pricing';
-import AddOns from './components/AddOns';
-import WhyChooseUs from './components/WhyChooseUs';
-import Contact from './components/Contact';
-import Footer from './components/Footer';
+
+// Lazy load below-the-fold components to improve initial load time
+const Services = lazy(() => import('./components/Services'));
+const Pricing = lazy(() => import('./components/Pricing'));
+const AddOns = lazy(() => import('./components/AddOns'));
+const WhyChooseUs = lazy(() => import('./components/WhyChooseUs'));
+const Contact = lazy(() => import('./components/Contact'));
+const Footer = lazy(() => import('./components/Footer'));
+
+// A simple fallback spinner for lazy loaded sections
+const SectionLoader = () => (
+  <div className="py-20 flex justify-center items-center w-full">
+    <div className="w-10 h-10 border-4 border-yellow-200 border-l-yellow-600 rounded-full animate-spin"></div>
+  </div>
+);
 
 function App() {
+  useEffect(() => {
+    // Remove the initial HTML loader once React has mounted
+    const loader = document.getElementById('initial-loader');
+    if (loader) {
+      loader.style.opacity = '0';
+      setTimeout(() => {
+        if (loader.parentNode) {
+          loader.parentNode.removeChild(loader);
+        }
+      }, 500); // Wait for transition to finish
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
       <main>
         <Hero />
-        <Services />
-        <Pricing />
-        <AddOns />
-        <WhyChooseUs />
-        <Contact />
+        <Suspense fallback={<SectionLoader />}>
+          <Services />
+          <Pricing />
+          <AddOns />
+          <WhyChooseUs />
+          <Contact />
+        </Suspense>
       </main>
-      <Footer />
+      <Suspense fallback={null}>
+        <Footer />
+      </Suspense>
       {/* WhatsApp Floating Button */}
       <a
         href="https://wa.me/918667219624"
