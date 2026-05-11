@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { collection, addDoc } from 'firebase/firestore';
-import { db } from '../firebase';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -10,8 +8,6 @@ export default function Contact() {
     projectType: 'Website Development',
     message: ''
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null); // 'success' or 'error'
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,29 +17,22 @@ export default function Contact() {
     }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitStatus(null);
+    const whatsappMessage = `Hello Pretty Forge Studios,
 
-    try {
-      await addDoc(collection(db, 'contact_queries'), {
-        ...formData,
-        timestamp: new Date()
-      });
-      setSubmitStatus('success');
-      setFormData({
-        fullName: '',
-        email: '',
-        projectType: 'Website Development',
-        message: ''
-      });
-    } catch (error) {
-      console.error("Error adding document: ", error);
-      setSubmitStatus('error');
-    } finally {
-      setIsSubmitting(false);
-    }
+My name is ${formData.fullName}.
+Email: ${formData.email}
+
+I'm interested in: ${formData.projectType}
+
+Project Details:
+${formData.message}
+
+Looking forward to hearing from you!`;
+
+    const url = `https://wa.me/918667219624?text=${encodeURIComponent(whatsappMessage)}`;
+    window.open(url, '_blank');
   };
   return (
     <section id="contact" className="section-padding bg-white relative overflow-hidden">
@@ -154,24 +143,14 @@ export default function Contact() {
                 ></textarea>
               </div>
 
-              {submitStatus === 'success' && (
-                <div className="p-4 rounded-2xl bg-green-50 text-green-700 text-sm font-medium">
-                  Message sent successfully! We will get back to you soon.
-                </div>
-              )}
-
-              {submitStatus === 'error' && (
-                <div className="p-4 rounded-2xl bg-red-50 text-red-700 text-sm font-medium">
-                  Failed to send message. Please try again or contact us directly.
-                </div>
-              )}
-
               <button 
                 type="submit" 
-                disabled={isSubmitting}
-                className="w-full py-5 rounded-2xl bg-gray-900 text-white font-bold text-lg hover:bg-[#c8a84e] transition-all duration-300 shadow-xl shadow-gray-200 hover:shadow-[#c8a84e]/20 disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full py-5 rounded-2xl bg-[#25D366] text-white font-bold text-lg hover:bg-[#128C7E] transition-all duration-300 shadow-xl shadow-green-200/30 hover:shadow-green-400/20 flex items-center justify-center gap-3"
               >
-                {isSubmitting ? 'Sending...' : 'Send Message'}
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c-.003 1.396.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/>
+                </svg>
+                Send via WhatsApp
               </button>
             </form>
           </motion.div>
