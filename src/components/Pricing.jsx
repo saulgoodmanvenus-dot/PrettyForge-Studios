@@ -25,7 +25,6 @@ const pricingPlans = [
     name: "E-Commerce Website",
     price: "₹7,999",
     tagline: "Launch your online store with ease",
-    isPopular: true,
     plans: [
       { label: "Starter (10 Products)", price: "₹7,999" },
       { label: "Growth (50 Products)", price: "₹11,999" },
@@ -47,10 +46,11 @@ const pricingPlans = [
   },
   {
     name: "3D Configurator",
-    price: "₹19,999",
+    price: "₹15,999",
     tagline: "Immersive 3D experiences for products",
+    isPopular: true,
     plans: [
-      { label: "Basic (1 Product)", price: "₹19,999" },
+      { label: "Basic (1 Product)", price: "₹15,999" },
       { label: "Standard (1–3 Products)", price: "₹29,999" },
       { label: "Advanced (Multiple)", price: "₹49,999+" }
     ],
